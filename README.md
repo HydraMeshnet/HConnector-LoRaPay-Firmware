@@ -1,3 +1,16 @@
+# ĦConnector LoRaPay Firmware
+
+Our LoRa radio module for connection from ĦWallet and ĦCommunicator to the HydraMeshnet without internet connection.
+
+
+## Installation
+
+### Android
+For your Android devices, download our ĦWallet or ĦCommunicator app and following the connection wizard.
+
+
+## Source / Based on RNode Firmware - Community Editio
+
 # RNode Firmware - Community Edition
 
 This is the community maintained fork of the open firmware which powers RNode devices. It has been created to continue to expand development and support for more hardware devices, as the upstream repository is no longer accepting PRs for new hardware support. The original repository by Mark Qvist can be found [here](https://github.com/markqvist/RNode_Firmware).

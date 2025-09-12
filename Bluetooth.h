@@ -45,7 +45,7 @@ uint32_t bt_pairing_started = 0;
 uint8_t dev_bt_mac[BT_DEV_ADDR_LEN];
 char bt_da[BT_DEV_ADDR_LEN];
 char bt_dh[BT_DEV_HASH_LEN];
-char bt_devname[11];
+char bt_devname[VENDOR_BT_DEVNAME_LEN];
 
 #if MCU_VARIANT == MCU_ESP32
   #if HAS_BLUETOOTH == true
@@ -131,7 +131,7 @@ char bt_devname[11];
               data[BT_DEV_ADDR_LEN] = EEPROM.read(eeprom_addr(ADDR_SIGNATURE));
               unsigned char *hash = MD5::make_hash(data, BT_DEV_ADDR_LEN);
               memcpy(bt_dh, hash, BT_DEV_HASH_LEN);
-              sprintf(bt_devname, "RNode %02X%02X", bt_dh[14], bt_dh[15]);
+              sprintf(bt_devname, VENDOR_BT_DEVNAME " %02X%02X", bt_dh[14], bt_dh[15]);
               free(data);
 
               SerialBT.enableSSP();
@@ -331,7 +331,7 @@ char bt_devname[11];
               data[BT_DEV_ADDR_LEN] = EEPROM.read(eeprom_addr(ADDR_SIGNATURE));
               unsigned char *hash = MD5::make_hash(data, BT_DEV_ADDR_LEN);
               memcpy(bt_dh, hash, BT_DEV_HASH_LEN);
-              sprintf(bt_devname, "RNode %02X%02X", bt_dh[14], bt_dh[15]);
+              sprintf(bt_devname, VENDOR_BT_DEVNAME " %02X%02X", bt_dh[14], bt_dh[15]);
               free(data);
 
               bt_security_setup();
@@ -529,7 +529,7 @@ char bt_devname[11];
         #endif
         unsigned char *hash = MD5::make_hash(data, BT_DEV_ADDR_LEN);
         memcpy(bt_dh, hash, BT_DEV_HASH_LEN);
-        sprintf(bt_devname, "RNode %02X%02X", bt_dh[14], bt_dh[15]);
+        sprintf(bt_devname, VENDOR_BT_DEVNAME " %02X%02X", bt_dh[14], bt_dh[15]);
         free(data);
 
         bt_ready = true;

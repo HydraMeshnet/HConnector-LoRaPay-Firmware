@@ -888,7 +888,7 @@ void update_stat_area() {
   }
 }
 
-extern char bt_devname[11];
+extern char bt_devname[VENDOR_BT_DEVNAME_LEN];
 extern char bt_dh[16];
 
 void draw_disp_area() {
@@ -982,6 +982,17 @@ void draw_disp_area() {
         } else {
           disp_area.drawBitmap(0, 0, bm_def, disp_area.width(), 37, DISPLAY_WHITE, DISPLAY_BLACK);      
         }
+
+#ifdef VENDOR_DISPLAY_OVERLAY
+        disp_area.fillRect(0,0,disp_area.width(),21,DISPLAY_WHITE);
+        disp_area.setFont(SMALL_FONT); disp_area.setTextWrap(false); disp_area.setTextColor(DISPLAY_BLACK); disp_area.setTextSize(1);
+  #ifdef VENDOR_DISPLAY_ROW1
+        disp_area.setCursor(3, 8); disp_area.print(VENDOR_DISPLAY_ROW1);
+  #endif
+  #ifdef VENDOR_DISPLAY_ROW2
+        disp_area.setCursor(3, 17); disp_area.print(VENDOR_DISPLAY_ROW2);
+  #endif
+#endif
 
         // display device ID beneath header
         disp_area.setFont(SMALL_FONT); disp_area.setTextWrap(false); disp_area.setCursor(13, 32); disp_area.setTextColor(DISPLAY_WHITE); disp_area.setTextSize(2);
