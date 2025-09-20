@@ -13,9 +13,40 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifdef HAS_RNS
+#include <Reticulum.h>
+#include <Transport.h>
+#include <Interface.h>
+#include <Log.h>
+#include <Bytes.h>
+#include <queue>
+
+#ifdef HAS_RNS_TEST
+#include <Identity.h>
+#include <Destination.h>
+#include <Packet.h>
+#endif
+
+#endif
+
 #include <Arduino.h>
 #include <SPI.h>
 #include "Utilities.h"
+
+#ifdef HAS_RNS
+#ifdef RNS_USE_FS
+#include "FileSystem.h"
+#else
+#include "NoopFileSystem.h"
+#endif
+#endif
+
+#if MCU_VARIANT == MCU_ESP32
+  #include <esp_task_wdt.h>
+#endif
+
+// WDT timeout
+#define WDT_TIMEOUT 60 // seconds
 
 #if MCU_VARIANT == MCU_NRF52
   #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_OPENCOM_XL
@@ -103,6 +134,146 @@ char sbuf[128];
 
 uint8_t *packet_queue[INTERFACE_COUNT];
 
+#ifdef HAS_RNS
+class LoRaInterface : public RNS::InterfaceImpl {
+public:
+  LoRaInterface() : RNS::InterfaceImpl("LoRaInterface") {
+    _IN = true;
+    _OUT = true;
+  }
+  LoRaInterface(const char *name) : RNS::InterfaceImpl(name) {
+    _IN = true;
+    _OUT = true;
+  }
+  virtual ~LoRaInterface() {
+    _name = "deleted";
+  }
+protected:
+  virtual void send_outgoing(const RNS::Bytes& data) {
+    TRACEF("LoRaInterface.send_outgoing: (%u bytes) data: %s", data.size(), data.toHex().c_str());
+    TRACE("LoRaInterface.send_outgoing: adding packet to outgoing queue...");
+
+    if (interface < INTERFACE_COUNT) {
+      for (size_t i = 0; i < data.size(); i++) {
+        if (queue_height[interface] < CONFIG_QUEUE_MAX_LENGTH && queued_bytes[interface] < (getQueueSize(interface))) {
+          queued_bytes[interface]++;
+          packet_queue[interface][queue_cursor[interface]++] = data.data()[i];
+          if (queue_cursor[interface] == getQueueSize(interface)) queue_cursor[interface] = 0;
+        }
+      }
+
+      if (!fifo16_isfull(&packet_starts[interface]) && (queued_bytes[interface] < (getQueueSize(interface)))) {
+        uint16_t s = current_packet_start[interface];
+        int32_t e = queue_cursor[interface]-1; if (e == -1) e = (getQueueSize(interface))-1;
+        uint16_t l;
+
+        if (s != e) {
+          l = (s < e) ? e - s + 1: (getQueueSize(interface)) - s + e + 1;
+        } else {
+          l = 1;
+        }
+
+        if (l >= MIN_L) {
+          queue_height[interface]++;
+
+          fifo16_push(&packet_starts[interface], s);
+          fifo16_push(&packet_lengths[interface], l);
+          current_packet_start[interface] = queue_cursor[interface];
+        }
+      }
+    }
+    InterfaceImpl::handle_outgoing(data);
+  }
+};
+
+void onRNSLog(const char* msg, RNS::LogLevel level) {
+  String line = RNS::getTimeString() + String(" [") + RNS::getLevelName(level) + "] " + msg + "\n";
+  Serial.print(line);
+  Serial.flush();
+}
+
+RNS::Reticulum reticulum(RNS::Type::NONE);
+RNS::Interface lora_interface(RNS::Type::NONE);
+RNS::FileSystem filesystem(RNS::Type::NONE);
+
+#ifdef HAS_RNS_TEST
+RNS::Identity reticulum_identity({RNS::Type::NONE});
+RNS::Destination reticulum_lxmf_destination({RNS::Type::NONE});
+RNS::Destination reticulum_page_destination({RNS::Type::NONE});
+RNS::Link reticulum_page_client_link({RNS::Type::NONE});
+double reticulum_announce_ts = 0.0;
+
+class ReticulumAnnounceHandler : public RNS::AnnounceHandler {
+public:
+	ReticulumAnnounceHandler(const char* aspect_filter = nullptr) : AnnounceHandler(aspect_filter) {}
+	virtual ~ReticulumAnnounceHandler() {}
+	virtual void received_announce(const RNS::Bytes& destination_hash, const RNS::Identity& announced_identity, const RNS::Bytes& app_data) {
+		INFO("TEST - AnnounceHandler: Destination hash: " + destination_hash.toHex());
+		if (announced_identity) {
+			INFO("TEST - AnnounceHandler: Identity hash: " + announced_identity.hash().toHex());
+			INFO("TEST - AnnounceHandler: Identity app data: " + announced_identity.app_data().toHex());
+		}
+        if (app_data) {
+			INFO("TEST - AnnounceHandler: Identity app data text: \"" + app_data.toString() + "\"");
+		}
+	}
+};
+
+RNS::HAnnounceHandler reticulum_announce_handler(new ReticulumAnnounceHandler());
+
+void reticulum_announce() {
+  if (reticulum_lxmf_destination) {
+    HEAD("TEST - LXMF - Announcing destination: "+reticulum_lxmf_destination.hash().toHex()+": "+bt_devname, RNS::LOG_TRACE);
+    reticulum_lxmf_destination.announce(bt_devname);
+  }
+  if (reticulum_page_destination) {
+    HEAD("TEST - Page - Announcing destination: "+reticulum_page_destination.hash().toHex()+": "+bt_devname, RNS::LOG_TRACE);
+    reticulum_page_destination.announce(bt_devname);
+  }
+}
+
+void reticulum_lxmf_packet_rx(const RNS::Bytes& data, const RNS::Packet& packet) {
+	INFO("TEST - LXMF - Packet RX: data: " + data.toHex());
+	INFO("TEST - LXMF - Packet RX: text: \"" + data.toString() + "\"");
+	//TRACE("onPacket: " + packet.debugString());
+}
+void reticulum_page_packet_rx(const RNS::Bytes& message, const RNS::Packet& packet) {
+  std::string text = message.toString();
+  INFO("TEST - Page - Packet RX: "+text);
+  std::string reply_text = "I received \""+text+"\" over the link";
+  RNS::Bytes reply_data(reply_text);
+  RNS::Packet(reticulum_page_client_link, reply_data).send();
+}
+
+void reticulum_page_client_disconnected(RNS::Link& link) {
+	INFO("TEST - Page - Client disconnected");
+}
+
+void reticulum_page_client_connected(RNS::Link& link) {
+	INFO("TEST - Page - Client connected");
+	link.set_link_closed_callback(reticulum_page_client_disconnected);
+	link.set_packet_callback(reticulum_page_packet_rx);
+	reticulum_page_client_link = link;
+}
+#endif
+
+void rnsToLoraInterface(int index) {
+  RNS::Bytes data(MTU);
+  for (uint16_t i = 0; i < read_len[index]; i++) {
+    #if MCU_VARIANT == MCU_NRF52
+      portENTER_CRITICAL();
+      uint8_t byte = pbuf[i];
+      portEXIT_CRITICAL();
+    #else
+      uint8_t byte = pbuf[i];
+    #endif
+    data << byte;
+  }
+  lora_interface.handle_incoming(data);
+}
+
+#endif
+
 void setup() {
   #if MCU_VARIANT == MCU_ESP32
     boot_seq();
@@ -170,6 +341,28 @@ void setup() {
   fifo_init(&serialFIFO, serialBuffer, CONFIG_UART_BUFFER_SIZE);
 
   Serial.begin(serial_baudrate);
+
+  #ifdef HAS_RNS
+    // Safely wait for serial initialization
+    while (!Serial) {
+      if (millis() > 2000) {
+        break;
+      }
+      delay(10);
+    }
+    delay(2000);
+  #endif
+
+  // Configure WDT
+  #if MCU_VARIANT == MCU_ESP32
+    esp_task_wdt_init(WDT_TIMEOUT, true); // enable panic so ESP32 restarts
+    esp_task_wdt_add(NULL);               // add current thread to WDT watch
+  #elif MCU_VARIANT == MCU_NRF52
+    NRF_WDT->CONFIG         = 0x01;           // Configure WDT to run when CPU is asleep
+    NRF_WDT->CRV            = WDT_TIMEOUT * 32768 + 1; // set timeout
+    NRF_WDT->RREN           = 0x01;           // Enable the RR[0] reload register
+    NRF_WDT->TASKS_START    = 1;              // Start WDT
+  #endif
 
   #if HAS_NP
     led_init();
@@ -420,9 +613,78 @@ void setup() {
         }
     }
 
-
   // Validate board health, EEPROM and config
   validate_status();
+
+#ifdef HAS_RNS
+
+#ifdef RNS_USE_FS
+  filesystem = new FileSystem();
+  ((FileSystem*)filesystem.get())->init();
+#else
+  filesystem = new NoopFileSystem();
+  ((NoopFileSystem*)filesystem.get())->init();
+#endif
+
+  HEAD("Registering filesystem...", RNS::LOG_TRACE);
+  RNS::Utilities::OS::register_filesystem(filesystem);
+
+  RNS::setLogCallback(&onRNSLog);
+  RNS::loglevel(RNS::LOG_TRACE);
+
+  HEAD("Registering LoRA Interface...", RNS::LOG_TRACE);
+  lora_interface = new LoRaInterface();
+  lora_interface.mode(RNS::Type::Interface::MODE_GATEWAY);
+  RNS::Transport::register_interface(lora_interface);
+
+  HEAD("Creating Reticulum instance...", RNS::LOG_TRACE);
+  reticulum = RNS::Reticulum();
+  reticulum.transport_enabled(op_mode == MODE_TNC);
+  reticulum.probe_destination_enabled(true);
+  reticulum.start();
+
+  HEAD("RNS is READY!", RNS::LOG_TRACE);
+  if (op_mode == MODE_TNC) {
+    HEAD("RNS transport mode is ENABLED", RNS::LOG_TRACE);
+    TRACE(std::string("Frequency: " + std::to_string(selected_radio->getFrequency())) + " Hz");
+    TRACE(std::string("Bandwidth: " + std::to_string(selected_radio->getSignalBandwidth())) + " Hz");
+    TRACE(std::string("TX Power: " + std::to_string(selected_radio->getTxPower())) + " dBm");
+    TRACE(std::string("Spreading Factor: " + std::to_string(selected_radio->getSpreadingFactor())));
+    TRACE(std::string("Coding Rate: " + std::to_string(selected_radio->getCodingRate4())));
+  } else {
+    HEAD("RNS transport mode is DISABLED", RNS::LOG_INFO);
+    HEAD("Configure TNC mode with radio configuration to enable RNS transport", RNS::LOG_INFO);
+  }
+
+  #ifdef HAS_RNS_TEST
+    HEAD("TEST - Creating Identity instance...", RNS::LOG_TRACE);
+    reticulum_identity = RNS::Identity(false);
+    RNS::Bytes prv_bytes;
+    #ifdef ARDUINO
+      prv_bytes.assignHex("78E7D93E28D55871608FF13329A226CABC3903A357388A035B360162FF6321570B092E0583772AB80BC425F99791DF5CA2CA0A985FF0415DAB419BBC64DDFAE8");
+    #else
+      prv_bytes.assignHex("E0D43398EDC974EBA9F4A83463691A08F4D306D4E56BA6B275B8690A2FBD9852E9EBE7C03BC45CAEC9EF8E78C830037210BFB9986F6CA2DEE2B5C28D7B4DE6B0");
+    #endif
+    reticulum_identity.load_private_key(prv_bytes);
+
+    HEAD("TEST - LXMF - Creating Destination instance...", RNS::LOG_TRACE);
+    reticulum_lxmf_destination = RNS::Destination(reticulum_identity, RNS::Type::Destination::IN, RNS::Type::Destination::SINGLE, "lxmf", "delivery");
+    reticulum_lxmf_destination.set_packet_callback(reticulum_lxmf_packet_rx);
+    reticulum_lxmf_destination.set_proof_strategy(RNS::Type::Destination::PROVE_ALL);
+
+    HEAD("TEST - Page - Creating Destination instance...", RNS::LOG_TRACE);
+    reticulum_page_destination = RNS::Destination(reticulum_identity, RNS::Type::Destination::IN, RNS::Type::Destination::SINGLE, "nomadnetwork", "node");
+    reticulum_page_destination.set_link_established_callback(reticulum_page_client_connected);
+    reticulum_page_destination.set_proof_strategy(RNS::Type::Destination::PROVE_ALL);
+
+    HEAD("TEST - Registering announce handler...", RNS::LOG_TRACE);
+    RNS::Transport::register_announce_handler(reticulum_announce_handler);
+
+    reticulum_announce();
+  #endif
+
+#endif
+
 }
 
 void lora_receive(RadioInterface* radio) {
@@ -1428,6 +1690,15 @@ void validate_status() {
               }
             #endif
           }
+          #ifdef HAS_RNS
+            if (hw_ready && eeprom_have_conf()) {
+              op_mode = MODE_TNC;
+              if (interface < INTERFACE_COUNT) {
+                eeprom_conf_load(interface_obj[interface]);
+                startRadio(interface_obj[interface]);
+              }
+            }
+          #endif
         } else {
           hw_ready = false;
           Serial.write("Invalid EEPROM checksum\r\n");
@@ -1478,20 +1749,25 @@ void tx_queue_handler(RadioInterface* radio) {
       radio->setCWWaitTarget(radio->getCW() * radio->getCSMASlotMS());
     }
 
-    if (radio->getDifsWaitStart() == 0) {                                                  // DIFS wait not yet started
-      if (medium_free(radio)) { radio->setDifsWaitStart(millis()); return; }                  // Set DIFS wait start time
-      else               { return; } }                                            // Medium not yet free, continue waiting
-    
-    else {                                                                        // We are waiting for DIFS or CW to pass
-      if (!medium_free(radio)) { radio->setDifsWaitStart(0); radio->setCWWaitStart(0); return; }   // Medium became occupied while in DIFS wait, restart waiting when free again
-      else {                                                                      // Medium is free, so continue waiting
+    if (radio->getDifsWaitStart() == 0) {                                                              // DIFS wait not yet started
+      if (medium_free(radio)) { radio->setDifsWaitStart(millis()); return; }                           // Set DIFS wait start time
+      else {                                                                                           // Medium not yet free, continue waiting
+        #ifdef HAS_RNS
+          if (reticulum && op_mode == MODE_TNC) { delay(3); }
+        #endif
+        return;
+      }
+    }
+    else {                                                                                             // We are waiting for DIFS or CW to pass
+      if (!medium_free(radio)) { radio->setDifsWaitStart(0); radio->setCWWaitStart(0); return; }       // Medium became occupied while in DIFS wait, restart waiting when free again
+      else {                                                                                           // Medium is free, so continue waiting
         if (millis() < radio->getDifsWaitStart()+radio->getDifsMS()) { return; }                       // DIFS has not yet passed, continue waiting
-        else {                                                                    // DIFS has passed, and we are now in CW wait
-          if (radio->getCWWaitStart() == 0) { radio->setCWWaitStart(millis()); return; }          // If we haven't started counting CW wait time, do it from now
-          else {                                                                  // If we are already counting CW wait time, add it to the counter
+        else {                                                                                         // DIFS has passed, and we are now in CW wait
+          if (radio->getCWWaitStart() == 0) { radio->setCWWaitStart(millis()); return; }               // If we haven't started counting CW wait time, do it from now
+          else {                                                                                       // If we are already counting CW wait time, add it to the counter
             radio->addCWWaitPassed(millis()-radio->getCWWaitStart()); radio->setCWWaitStart(millis());
-            if (radio->getCWWaitStatus()) { return; }                      // Contention window wait time has not yet passed, continue waiting
-            else {                                                                // Wait time has passed, flush the queue
+            if (radio->getCWWaitStatus()) { return; }                                                  // Contention window wait time has not yet passed, continue waiting
+            else {                                                                                     // Wait time has passed, flush the queue
               if (!radio->getLimitRate()) { flush_queue(radio); } else { pop_queue(radio); }
               radio->resetCWWaitPassed(); radio->setCW(-1); radio->setDifsWaitStart(0); }
           }
@@ -1504,6 +1780,20 @@ void tx_queue_handler(RadioInterface* radio) {
 void work_while_waiting() { loop(); }
 
 void loop() {
+
+    #ifdef HAS_RNS
+      if (reticulum && op_mode == MODE_TNC) {
+        reticulum.loop();
+
+        #ifdef HAS_RNS_TEST
+          if ((RNS::Utilities::OS::time() - reticulum_announce_ts) > 300) {
+            reticulum_announce();
+            reticulum_announce_ts = RNS::Utilities::OS::time();
+          }
+        #endif
+      }
+    #endif
+
     #if MCU_VARIANT == MCU_ESP32
       modem_packet_t *modem_packet = NULL;
       if(modem_packet_queue && xQueueReceive(modem_packet_queue, &modem_packet, 0) == pdTRUE && modem_packet) {
@@ -1514,6 +1804,10 @@ void loop() {
         memcpy(&pbuf, modem_packet->data, modem_packet->len);
         free(modem_packet);
         modem_packet = NULL;
+
+        #ifdef HAS_RNS
+          rnsToLoraInterface(packet_interface);
+        #endif
 
         kiss_indicate_stat_rssi(interface_obj[packet_interface]);
         kiss_indicate_stat_snr(interface_obj[packet_interface]);
@@ -1531,6 +1825,10 @@ void loop() {
         free(modem_packet);
         modem_packet = NULL;
 
+        #ifdef HAS_RNS
+          rnsToLoraInterface(packet_interface);
+        #endif
+
         kiss_indicate_stat_rssi(interface_obj[packet_interface]);
         kiss_indicate_stat_snr(interface_obj[packet_interface]);
         kiss_write_packet(packet_interface);
@@ -1544,7 +1842,6 @@ void loop() {
             ready = true;
         }
     }
-
 
   // If at least one radio is online then we can continue
   if (ready) {
@@ -1637,6 +1934,13 @@ void loop() {
       kiss_indicate_error(ERROR_MEMORY_LOW); memory_low = false;
     #endif
   }
+
+  // Feed WDT
+#if MCU_VARIANT == MCU_ESP32
+  esp_task_wdt_reset();
+#elif MCU_VARIANT == MCU_NRF52
+  NRF_WDT->RR[0] = WDT_RR_RR_Reload;
+#endif
 }
 
 void process_serial() {

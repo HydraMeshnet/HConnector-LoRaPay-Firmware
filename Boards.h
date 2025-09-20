@@ -45,6 +45,7 @@
   #define MODEL_A5            0xA5 // T3S3, 433 MHz with SX1278
   #define MODEL_A6            0xA6 // T3S3, 868 MHz with SX1262
   #define MODEL_AA            0xAA // T3S3, 868 MHz with SX1276
+  #define MODEL_AB            0xAA // T3S3, 868 MHz with SX1276
   #define MODEL_AC            0xAC // T3S3, 2.4 GHz with SX1280 and PA
 
   #define PRODUCT_TBEAM       0xE0 // T-Beam devices
@@ -410,7 +411,6 @@
       #define DISPLAY OLED
       #define HAS_BLUETOOTH true
       #define HAS_PMU true
-      #define HAS_NP true
       #define HAS_CONSOLE true
       #define HAS_EEPROM true
       #define INTERFACE_COUNT 1

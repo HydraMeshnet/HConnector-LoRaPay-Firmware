@@ -973,8 +973,14 @@ void draw_disp_area() {
         // TODO, for some reason there is a weird artifact at the top of the screen if this line isn't here. Need to investigate.
         disp_area.fillRect(0,0,disp_area.width(),8,DISPLAY_WHITE);
 
-        // display device ID on top bar
-        disp_area.setCursor(4, 5); disp_area.print(bt_devname);
+        if (op_mode == MODE_TNC) {
+          // Indicate that this is a Transport node
+          disp_area.setCursor(2, 5); disp_area.print("T:");
+          disp_area.setCursor(12, 5); disp_area.print(bt_devname);
+        } else {
+          // display device ID on top bar
+          disp_area.setCursor(2, 5); disp_area.print(bt_devname);
+        }
 
       } else {
         if (device_signatures_ok()) {
