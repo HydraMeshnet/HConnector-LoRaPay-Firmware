@@ -697,7 +697,7 @@ void sx126x::sleep()
 
 void sx126x::enableTCXO() {
   if (_tcxo) {
-    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_OPENCOM_XL || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_XIAO_ESP32S3
+    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_OPENCOM_XL || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_XIAO_ESP32S3
       uint8_t buf[4] = {MODE_TCXO_3_3V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_TBEAM
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
@@ -739,10 +739,12 @@ void sx126x::setTxPower(int level, int outputPin) {
 
     executeOpcode(OP_PA_CONFIG_6X, pa_buf, 4); // set pa_config for high power
 
+    _txp = level; // TODO: Add Heltec V4 power settings
+
     if (level > 22) { level = 22; }
     else if (level < -9) { level = -9; }
 
-    _txp = level;
+    // _txp = level; // TODO: Add Heltec V4 power settings
 
     writeRegister(REG_OCP_6X, OCP_TUNED); // 160mA limit, overcurrent protection
 

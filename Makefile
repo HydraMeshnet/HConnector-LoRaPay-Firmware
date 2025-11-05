@@ -125,6 +125,9 @@ firmware-heltec32_v2_extled: check_bt_buffers
 firmware-heltec32_v3:
 	arduino-cli compile --fqbn esp32:esp32:heltec_wifi_lora_32_V3 $(COMMON_BUILD_FLAGS) --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x3A\""
 
+firmware-heltec32_v4:
+	arduino-cli compile --fqbn esp32:esp32:heltec_wifi_lora_32_V4 $(COMMON_BUILD_FLAGS) --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x46\""
+
 firmware-heltec_w_paper:
 	arduino-cli compile --fqbn esp32:esp32:heltec_wifi_lora_32_V3 $(COMMON_BUILD_FLAGS) --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x3E\""
 
@@ -173,18 +176,18 @@ upload-tbeam_sx1262:
 	#python ./Release/esptool/esptool.py --chip esp32 --port /dev/ttyACM0 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x210000 ./Release/console_image.bin
 
 upload-lora32_v10:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:ttgo-lora32
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:ttgo-lora32
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-lora32_v20:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:ttgo-lora32
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:ttgo-lora32
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-lora32_v21:
 	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:ttgo-lora32
@@ -194,18 +197,25 @@ upload-lora32_v21:
 	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-heltec32_v2:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:heltec_wifi_lora_32_V2
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:heltec_wifi_lora_32_V2
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-heltec_w_paper upload-heltec32_v3:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:heltec_wifi_lora_32_V3
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:heltec_wifi_lora_32_V3
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) --chip esp32-s3 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x210000 ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) --chip esp32-s3 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x210000 ./Release/console_image.bin
+
+upload-heltec32_v4:
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:heltec_wifi_lora_32_V4
+	@sleep 1
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.bin)
+	@sleep 3
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) --chip esp32-s3 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 16MB 0x210000 ./Release/console_image.bin
 
 upload-xiao_s3:
 	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:XIAO_ESP32S3
@@ -229,11 +239,11 @@ upload-tbeam_supreme:
 	python ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) --chip esp32-s3 --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x210000 ./Release/console_image.bin
 
 upload-rnode_ng_20:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:ttgo-lora32
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:ttgo-lora32
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-rnode_ng_21:
 	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:ttgo-lora32
@@ -250,11 +260,11 @@ upload-t3s3:
 	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bin)
 
 upload-featheresp32:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:featheresp32
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:featheresp32
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.featheresp32/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.featheresp32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_UPLOAD_FLAGS) ./Release/console_image.bin
+	python ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-opencom-xl upload-rak4631:
 	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn rakwireless:nrf52:WisCoreRAK4631Board
@@ -262,11 +272,11 @@ upload-opencom-xl upload-rak4631:
 	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(sha256sum ./build/rakwireless.nrf52.WisCoreRAK4631Board/HConnector-LoRaPay-Firmware-master.ino.bin | grep -o '^\S*')
 
 upload-e22_esp32:
-	arduino-cli upload -p $(or $(port), /dev/ttyUSB0) --fqbn esp32:esp32:esp32
+	arduino-cli upload -p $(or $(port), /dev/ttyACM0) --fqbn esp32:esp32:esp32
 	@sleep 1
-	rnodeconf $(or $(port), /dev/ttyUSB0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.bin)
+	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyUSB0) $(COMMON_ESP_UPLOAD_FLAGS)  ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS)  ./Release/console_image.bin
 
 upload-heltec_t114:
 	arduino-cli upload -p /dev/ttyACM0 --fqbn Heltec_nRF52:Heltec_nRF52:HT-n5262
@@ -380,6 +390,15 @@ release-heltec32_v3:
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v3.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v3.partitions
 	zip --junk-paths ./Release/rnode_firmware_heltec32v3.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v3.boot_app0 build/rnode_firmware_heltec32v3.bin build/rnode_firmware_heltec32v3.bootloader build/rnode_firmware_heltec32v3.partitions
+	rm -r build
+
+release-heltec32_v4:
+	arduino-cli compile --fqbn esp32:esp32:heltec_wifi_lora_32_V4 $(COMMON_BUILD_FLAGS) --build-property "compiler.cpp.extra_flags=\"-DBOARD_MODEL=0x46\""
+	cp ~/.arduino15/packages/esp32/hardware/esp32/$(ARDUINO_ESP_CORE_VER)/tools/partitions/boot_app0.bin build/rnode_firmware_heltec32v4pa.boot_app0
+	cp build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.bin build/rnode_firmware_heltec32v4pa.bin
+	cp build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v4pa.bootloader
+	cp build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v4pa.partitions
+	zip --junk-paths ./Release/rnode_firmware_heltec32v4pa.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v4pa.boot_app0 build/rnode_firmware_heltec32v4pa.bin build/rnode_firmware_heltec32v4pa.bootloader build/rnode_firmware_heltec32v4pa.partitions
 	rm -r build
 
 release-heltec_w_paper:
