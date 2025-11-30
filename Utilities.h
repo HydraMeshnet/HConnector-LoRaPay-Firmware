@@ -737,6 +737,51 @@ void led_indicate_not_ready() {
     }
 #endif
 
+#if HAS_LORA_PA
+const int tx_gain[PA_GAIN_POINTS] = {PA_GAIN_VALUES};
+#endif
+
+int map_target_power_to_modem_output(int target_tx_power) {
+	#if HAS_LORA_PA
+	int modem_output_dbm = -9;
+	for (int i = 0; i < PA_GAIN_POINTS; i++) {
+		int gain = tx_gain[i];
+		int effective_output_dbm = i + gain;
+		printf("At %d dBm modem output, gain is %d dBm, effective output is %d\n", i, gain, effective_output_dbm);
+		if (effective_output_dbm > target_tx_power) {
+			int diff = effective_output_dbm - target_tx_power;
+			modem_output_dbm = -1*diff;
+			break;
+		} else if (effective_output_dbm == target_tx_power) {
+			modem_output_dbm = i; break;
+		} else if (i == PA_GAIN_POINTS-1) {
+			int diff = target_tx_power - effective_output_dbm;
+			modem_output_dbm = i+diff; break;
+		}
+	}
+	#else
+	int modem_output_dbm = target_tx_power;
+	#endif
+
+	return modem_output_dbm;
+}
+
+int map_modem_output_to_target_power(int modem_output_dbm) {
+	#if HAS_LORA_PA
+	if (modem_output_dbm < 0)               { modem_output_dbm = 0; }
+	if (modem_output_dbm >= PA_GAIN_POINTS) { modem_output_dbm = PA_GAIN_POINTS-1; }
+	int gain = tx_gain[modem_output_dbm];
+	int target_tx_power = modem_output_dbm+gain;
+	#else
+	int target_tx_power = modem_output_dbm;
+	#endif
+
+	return target_tx_power;
+}
+
+int getTXPower(RadioInterface* radio) {
+	return map_modem_output_to_target_power(radio->getTxPower());
+}
 
 bool interface_bitrate_cmp(RadioInterface* p, RadioInterface* q) {
     long p_bitrate = p->getBitrate();
@@ -884,7 +929,7 @@ void kiss_indicate_implicit_length() {
 }
 
 void kiss_indicate_txpower(RadioInterface* radio) {
-    int8_t txp = radio->getTxPower();
+    int8_t txp = getTXPower(radio);
 	serial_write(FEND);
     serial_write(CMD_SEL_INT);
     serial_write(radio->getIndex());
@@ -1229,6 +1274,10 @@ void set_implicit_length(uint8_t len) {
 }
 
 void setTXPower(RadioInterface* radio, int txp) {
+    #if HAS_LORA_PA
+      if (txp > PA_MAX_OUTPUT) txp = PA_MAX_OUTPUT;
+	#endif
+    txp = map_target_power_to_modem_output(txp);
     // Todo, revamp this function. The current parameters for setTxPower are
     // suboptimal, as some chips have power amplifiers which means that the max
     // dBm is not always the same.
@@ -1741,7 +1790,7 @@ void eeprom_conf_save(RadioInterface* radio) {
 	if (hw_ready && radio->getRadioOnline()) {
 		eeprom_update(eeprom_addr(ADDR_CONF_SF), radio->getSpreadingFactor());
 		eeprom_update(eeprom_addr(ADDR_CONF_CR), radio->getCodingRate4());
-		eeprom_update(eeprom_addr(ADDR_CONF_TXP), radio->getTxPower());
+		eeprom_update(eeprom_addr(ADDR_CONF_TXP), getTXPower(radio));
 
         uint32_t bw = radio->getSignalBandwidth();
 

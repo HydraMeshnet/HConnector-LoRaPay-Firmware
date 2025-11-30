@@ -163,6 +163,8 @@
   #define HAS_EEPROM false
   #define HAS_INPUT false
   #define HAS_SLEEP false
+  #define HAS_LORA_PA false
+  #define HAS_LORA_LNA false
   #define PIN_DISP_SLEEP -1
   #define VALIDATE_FIRMWARE true
 
@@ -491,6 +493,8 @@
       #define INTERFACE_COUNT 1
       #define HAS_INPUT true
       #define HAS_SLEEP true
+      #define HAS_LORA_PA false
+      #define HAS_LORA_LNA false
       #define PIN_WAKEUP GPIO_NUM_0
       #define WAKEUP_LEVEL 0
 
@@ -540,6 +544,8 @@
       #define HAS_EEPROM true
       #define HAS_INPUT true
       #define HAS_SLEEP true
+      #define HAS_LORA_PA false
+      #define HAS_LORA_LNA false
       #define PIN_WAKEUP GPIO_NUM_0
       #define WAKEUP_LEVEL 0
       #define INTERFACE_COUNT 1
@@ -591,10 +597,13 @@
       #define HAS_EEPROM true
       #define HAS_INPUT true
       #define HAS_SLEEP true
+      #define HAS_LORA_PA true
+      #define HAS_LORA_LNA true
       #define PIN_WAKEUP GPIO_NUM_0
       #define WAKEUP_LEVEL 0
       #define INTERFACE_COUNT 1
       #define OCP_TUNED 0x38
+      #define Vext GPIO_NUM_36
 
       const int pin_btn_usr1 = 0;
 
@@ -605,6 +614,16 @@
         const int pin_led_rx = 35;
         const int pin_led_tx = 35;
       #endif
+
+      #define LORA_LNA_GAIN  17
+      #define LORA_PA_GC1109 true
+      #define LORA_PA_PWR_EN  7
+      #define LORA_PA_CSD     2
+      #define LORA_PA_CPS    46
+
+      #define PA_MAX_OUTPUT  28
+      #define PA_GAIN_POINTS 22
+      #define PA_GAIN_VALUES 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 10, 10, 9, 9, 8, 7
 
       const uint8_t interfaces[INTERFACE_COUNT] = {SX1262};
       const bool interface_cfg[INTERFACE_COUNT][3] = { 

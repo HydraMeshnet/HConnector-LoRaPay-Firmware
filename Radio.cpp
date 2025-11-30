@@ -399,6 +399,30 @@ int sx126x::begin()
   setModulationParams(_sf, _bw, _cr, _ldro);
   setPacketParams(_preambleLength, _implicitHeaderMode, _payloadLength, _crcMode);
 
+  #if HAS_LORA_PA
+  #if LORA_PA_GC1109
+  // Enable Vfem_ctl for supply to
+  // PA power net.
+  pinMode(LORA_PA_PWR_EN, OUTPUT);
+  digitalWrite(LORA_PA_PWR_EN, HIGH);
+
+  // Enable PA LNA and TX standby
+  pinMode(LORA_PA_CSD, OUTPUT);
+  digitalWrite(LORA_PA_CSD, HIGH);
+
+  // Keep PA CPS low until actual
+  // transmit. Does it save power?
+  // Who knows? Will have to measure.
+  pinMode(LORA_PA_CPS, OUTPUT);
+  digitalWrite(LORA_PA_CPS, LOW);
+
+  // On Heltec V4, the PA CTX pin
+  // is driven by the SX1262 DIO2
+  // pin directly, so we do not
+  // need to manually raise this.
+  #endif
+  #endif
+
   _radio_online = true;
   return 1;
 }
@@ -420,6 +444,13 @@ void sx126x::end()
 
 int sx126x::beginPacket(int implicitHeader)
 {
+  #if HAS_LORA_PA
+  #if LORA_PA_GC1109
+  // Enable PA CPS for transmit
+  digitalWrite(LORA_PA_CPS, HIGH);
+  #endif
+  #endif
+
   standby();
 
   if (implicitHeader) {
@@ -511,6 +542,9 @@ int ISR_VECT sx126x::currentRssi() {
     uint8_t byte = 0;
     executeOpcodeRead(OP_CURRENT_RSSI_6X, &byte, 1);
     int rssi = -(int(byte)) / 2;
+    #if HAS_LORA_LNA
+    rssi -= LORA_LNA_GAIN;
+    #endif
     return rssi;
 }
 
@@ -525,6 +559,9 @@ int ISR_VECT sx126x::packetRssi(uint8_t pkt_snr_raw) {
     uint8_t buf[3] = {0};
     executeOpcodeRead(OP_PACKET_STATUS_6X, buf, 3);
     int pkt_rssi = -buf[0] / 2;
+    #if HAS_LORA_LNA
+    pkt_rssi -= LORA_LNA_GAIN;
+    #endif
     return pkt_rssi;
 }
 
@@ -658,6 +695,13 @@ void sx126x::onReceive(void(*callback)(uint8_t, int))
 
 void sx126x::receive(int size)
 {
+    #if HAS_LORA_PA
+    #if LORA_PA_GC1109
+    // Disable PA CPS for receive
+    digitalWrite(LORA_PA_CPS, LOW);
+    #endif
+    #endif
+
     if (size > 0) {
         implicitHeaderMode();
 
@@ -697,11 +741,13 @@ void sx126x::sleep()
 
 void sx126x::enableTCXO() {
   if (_tcxo) {
-    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_OPENCOM_XL || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_HELTEC32_V4 || BOARD_MODEL == BOARD_XIAO_ESP32S3
+    #if BOARD_MODEL == BOARD_RAK4631 || BOARD_MODEL == BOARD_OPENCOM_XL || BOARD_MODEL == BOARD_HELTEC32_V3 || BOARD_MODEL == BOARD_XIAO_ESP32S3
       uint8_t buf[4] = {MODE_TCXO_3_3V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_TBEAM
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_TECHO
+      uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
+    #elif BOARD_MODEL == BOARD_HELTEC32_V4
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
     #elif BOARD_MODEL == BOARD_T3S3
       uint8_t buf[4] = {MODE_TCXO_1_8V_6X, 0x00, 0x00, 0xFF};
@@ -739,12 +785,10 @@ void sx126x::setTxPower(int level, int outputPin) {
 
     executeOpcode(OP_PA_CONFIG_6X, pa_buf, 4); // set pa_config for high power
 
-    _txp = level; // TODO: Add Heltec V4 power settings
+    if (level > 22) level = 22;
+    if (level < -9) level = -9;
 
-    if (level > 22) { level = 22; }
-    else if (level < -9) { level = -9; }
-
-    // _txp = level; // TODO: Add Heltec V4 power settings
+    _txp = level;
 
     writeRegister(REG_OCP_6X, OCP_TUNED); // 160mA limit, overcurrent protection
 

@@ -1654,6 +1654,12 @@ void sleep_now() {
         display_intensity = 0;
         update_display(true);
       #endif
+      #if BOARD_MODEL == BOARD_HELTEC32_V4
+        digitalWrite(LORA_PA_CPS, LOW);
+        digitalWrite(LORA_PA_CSD, LOW);
+        digitalWrite(LORA_PA_PWR_EN, LOW);
+        digitalWrite(Vext, HIGH);
+      #endif
       #if PIN_DISP_SLEEP >= 0
         pinMode(PIN_DISP_SLEEP, OUTPUT);
         digitalWrite(PIN_DISP_SLEEP, DISP_SLEEP_LEVEL);
