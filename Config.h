@@ -25,8 +25,8 @@
 	#define VENDOR_DISPLAY_ROW1 "HConnector"
 	#define VENDOR_DISPLAY_ROW2 "LoRaPay"
 
-	#define MAJ_VERS  0x01
-	#define MIN_VERS  0x4b
+	#define MAJ_VERS  0x00
+	#define MIN_VERS  0x01
 
 	#define MODE_HOST 0x11
 	#define MODE_TNC  0x12
