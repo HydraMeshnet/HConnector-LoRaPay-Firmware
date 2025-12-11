@@ -473,8 +473,25 @@ bool init_pmu() {
     pinMode(pin_vbat, INPUT);
     return true;
   #elif BOARD_MODEL == BOARD_HELTEC32_V3
+    // there are three version of V3: V3, V3.1, and V3.2
+    // V3 and V3.1 have a pull up on pin_ctrl and are active low
+    // V3.2 has a transistor and active high
+    // put the pin input mode and read it.  if it's high, we have V3 or V3.1
+    // other wise, it's a V3.2
+    uint16_t pin_ctrl_value;
+    uint8_t pin_ctrl_active = LOW;
+    pinMode(pin_ctrl, INPUT);
+    pin_ctrl_value = digitalRead(pin_ctrl);
+    if(pin_ctrl_value == HIGH) {
+      // We have either a V3 or V3.1
+      pin_ctrl_active = LOW;
+    }
+    else {
+      // We have a V3.2
+      pin_ctrl_active = HIGH;
+    }
     pinMode(pin_ctrl,OUTPUT);
-    digitalWrite(pin_ctrl, LOW);
+    digitalWrite(pin_ctrl, pin_ctrl_active);
     return true;
   #elif BOARD_MODEL == BOARD_HELTEC32_V4
     pinMode(pin_ctrl,OUTPUT);
