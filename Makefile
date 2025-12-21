@@ -280,7 +280,7 @@ upload-e22_esp32:
 	@sleep 1
 	rnodeconf $(or $(port), /dev/ttyACM0) --firmware-hash $$(./partition_hashes ./build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.bin)
 	@sleep 3
-	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS)  ./Release/console_image.bin
+	python3 ./Release/esptool/esptool.py --port $(or $(port), /dev/ttyACM0) $(COMMON_ESP_UPLOAD_FLAGS) ./Release/console_image.bin
 
 upload-heltec_t114:
 	arduino-cli upload -p /dev/ttyACM0 --fqbn Heltec_nRF52:Heltec_nRF52:HT-n5262
@@ -304,7 +304,7 @@ release-tbeam: check_bt_buffers
 	cp build/esp32.esp32.t-beam/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_tbeam.bootloader
 	cp build/esp32.esp32.t-beam/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_tbeam.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_tbeam.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_tbeam.boot_app0 build/rnode_firmware_tbeam.bin build/rnode_firmware_tbeam.bootloader build/rnode_firmware_tbeam.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_tbeam.zip build/rnode_firmware_tbeam.boot_app0 build/rnode_firmware_tbeam.bin build/rnode_firmware_tbeam.bootloader build/rnode_firmware_tbeam.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-tbeam_sx1262: check_bt_buffers
@@ -314,7 +314,7 @@ release-tbeam_sx1262: check_bt_buffers
 	cp build/esp32.esp32.t-beam/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_tbeam_sx1262.bootloader
 	cp build/esp32.esp32.t-beam/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_tbeam_sx1262.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_tbeam_sx1262.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_tbeam_sx1262.boot_app0 build/rnode_firmware_tbeam_sx1262.bin build/rnode_firmware_tbeam_sx1262.bootloader build/rnode_firmware_tbeam_sx1262.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_tbeam_sx1262.zip build/rnode_firmware_tbeam_sx1262.boot_app0 build/rnode_firmware_tbeam_sx1262.bin build/rnode_firmware_tbeam_sx1262.bootloader build/rnode_firmware_tbeam_sx1262.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v10: check_bt_buffers
@@ -324,7 +324,7 @@ release-lora32_v10: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v10.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v10.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v10.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v10.boot_app0 build/rnode_firmware_lora32v10.bin build/rnode_firmware_lora32v10.bootloader build/rnode_firmware_lora32v10.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v10.zip build/rnode_firmware_lora32v10.boot_app0 build/rnode_firmware_lora32v10.bin build/rnode_firmware_lora32v10.bootloader build/rnode_firmware_lora32v10.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v20: check_bt_buffers
@@ -334,7 +334,7 @@ release-lora32_v20: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v20.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v20.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v20.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v20.boot_app0 build/rnode_firmware_lora32v20.bin build/rnode_firmware_lora32v20.bootloader build/rnode_firmware_lora32v20.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v20.zip build/rnode_firmware_lora32v20.boot_app0 build/rnode_firmware_lora32v20.bin build/rnode_firmware_lora32v20.bootloader build/rnode_firmware_lora32v20.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v21: check_bt_buffers
@@ -344,7 +344,7 @@ release-lora32_v21: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v21.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v21.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v21.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v21.boot_app0 build/rnode_firmware_lora32v21.bin build/rnode_firmware_lora32v21.bootloader build/rnode_firmware_lora32v21.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v21.zip build/rnode_firmware_lora32v21.boot_app0 build/rnode_firmware_lora32v21.bin build/rnode_firmware_lora32v21.bootloader build/rnode_firmware_lora32v21.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v10_extled: check_bt_buffers
@@ -354,7 +354,7 @@ release-lora32_v10_extled: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v10.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v10.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v10.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v10.boot_app0 build/rnode_firmware_lora32v10.bin build/rnode_firmware_lora32v10.bootloader build/rnode_firmware_lora32v10.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v10.zip build/rnode_firmware_lora32v10.boot_app0 build/rnode_firmware_lora32v10.bin build/rnode_firmware_lora32v10.bootloader build/rnode_firmware_lora32v10.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v20_extled: check_bt_buffers
@@ -364,7 +364,7 @@ release-lora32_v20_extled: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v20.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v20.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v20_extled.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v20.boot_app0 build/rnode_firmware_lora32v20.bin build/rnode_firmware_lora32v20.bootloader build/rnode_firmware_lora32v20.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v20_extled.zip build/rnode_firmware_lora32v20.boot_app0 build/rnode_firmware_lora32v20.bin build/rnode_firmware_lora32v20.bootloader build/rnode_firmware_lora32v20.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v21_extled: check_bt_buffers
@@ -374,7 +374,7 @@ release-lora32_v21_extled: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v21.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v21.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v21_extled.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v21.boot_app0 build/rnode_firmware_lora32v21.bin build/rnode_firmware_lora32v21.bootloader build/rnode_firmware_lora32v21.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v21_extled.zip build/rnode_firmware_lora32v21.boot_app0 build/rnode_firmware_lora32v21.bin build/rnode_firmware_lora32v21.bootloader build/rnode_firmware_lora32v21.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-lora32_v21_tcxo: check_bt_buffers
@@ -384,7 +384,7 @@ release-lora32_v21_tcxo: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_lora32v21_tcxo.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_lora32v21_tcxo.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_lora32v21_tcxo.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_lora32v21_tcxo.boot_app0 build/rnode_firmware_lora32v21_tcxo.bin build/rnode_firmware_lora32v21_tcxo.bootloader build/rnode_firmware_lora32v21_tcxo.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_lora32v21_tcxo.zip build/rnode_firmware_lora32v21_tcxo.boot_app0 build/rnode_firmware_lora32v21_tcxo.bin build/rnode_firmware_lora32v21_tcxo.bootloader build/rnode_firmware_lora32v21_tcxo.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-heltec32_v2: check_bt_buffers
@@ -394,7 +394,7 @@ release-heltec32_v2: check_bt_buffers
 	cp build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v2.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v2.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_heltec32v2.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v2.boot_app0 build/rnode_firmware_heltec32v2.bin build/rnode_firmware_heltec32v2.bootloader build/rnode_firmware_heltec32v2.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_heltec32v2.zip build/rnode_firmware_heltec32v2.boot_app0 build/rnode_firmware_heltec32v2.bin build/rnode_firmware_heltec32v2.bootloader build/rnode_firmware_heltec32v2.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-heltec32_v3:
@@ -404,7 +404,7 @@ release-heltec32_v3:
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v3.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v3.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_heltec32v3.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v3.boot_app0 build/rnode_firmware_heltec32v3.bin build/rnode_firmware_heltec32v3.bootloader build/rnode_firmware_heltec32v3.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_heltec32v3.zip build/rnode_firmware_heltec32v3.boot_app0 build/rnode_firmware_heltec32v3.bin build/rnode_firmware_heltec32v3.bootloader build/rnode_firmware_heltec32v3.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-heltec32_v4:
@@ -414,7 +414,7 @@ release-heltec32_v4:
 	cp build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v4pa.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V4/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v4pa.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_heltec32v4pa.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v4pa.boot_app0 build/rnode_firmware_heltec32v4pa.bin build/rnode_firmware_heltec32v4pa.bootloader build/rnode_firmware_heltec32v4pa.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_heltec32v4pa.zip build/rnode_firmware_heltec32v4pa.boot_app0 build/rnode_firmware_heltec32v4pa.bin build/rnode_firmware_heltec32v4pa.bootloader build/rnode_firmware_heltec32v4pa.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-heltec_w_paper:
@@ -424,7 +424,7 @@ release-heltec_w_paper:
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltecwpaper.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltecwpaper.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_heltecwpaper.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltecwpaper.boot_app0 build/rnode_firmware_heltecwpaper.bin build/rnode_firmware_heltecwpaper.bootloader build/rnode_firmware_heltecwpaper.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_heltecwpaper.zip build/rnode_firmware_heltecwpaper.boot_app0 build/rnode_firmware_heltecwpaper.bin build/rnode_firmware_heltecwpaper.bootloader build/rnode_firmware_heltecwpaper.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-xiao_s3:
@@ -434,7 +434,7 @@ release-xiao_s3:
 	cp build/esp32.esp32.XIAO_ESP32S3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_xiao_esp32s3.bootloader
 	cp build/esp32.esp32.XIAO_ESP32S3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_xiao_esp32s3.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_xiao_esp32s3.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_xiao_esp32s3.boot_app0 build/rnode_firmware_xiao_esp32s3.bin build/rnode_firmware_xiao_esp32s3.bootloader build/rnode_firmware_xiao_esp32s3.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_xiao_esp32s3.zip build/rnode_firmware_xiao_esp32s3.boot_app0 build/rnode_firmware_xiao_esp32s3.bin build/rnode_firmware_xiao_esp32s3.bootloader build/rnode_firmware_xiao_esp32s3.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-heltec32_v2_extled: check_bt_buffers
@@ -444,7 +444,7 @@ release-heltec32_v2_extled: check_bt_buffers
 	cp build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_heltec32v2.bootloader
 	cp build/esp32.esp32.heltec_wifi_lora_32_V2/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_heltec32v2.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_heltec32v2.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_heltec32v2.boot_app0 build/rnode_firmware_heltec32v2.bin build/rnode_firmware_heltec32v2.bootloader build/rnode_firmware_heltec32v2.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_heltec32v2.zip build/rnode_firmware_heltec32v2.boot_app0 build/rnode_firmware_heltec32v2.bin build/rnode_firmware_heltec32v2.bootloader build/rnode_firmware_heltec32v2.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-rnode_ng_20: check_bt_buffers
@@ -454,7 +454,7 @@ release-rnode_ng_20: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_ng20.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_ng20.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_ng20.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_ng20.boot_app0 build/rnode_firmware_ng20.bin build/rnode_firmware_ng20.bootloader build/rnode_firmware_ng20.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_ng20.zip build/rnode_firmware_ng20.boot_app0 build/rnode_firmware_ng20.bin build/rnode_firmware_ng20.bootloader build/rnode_firmware_ng20.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-rnode_ng_21: check_bt_buffers
@@ -464,7 +464,7 @@ release-rnode_ng_21: check_bt_buffers
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_ng21.bootloader
 	cp build/esp32.esp32.ttgo-lora32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_ng21.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_ng21.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_ng21.boot_app0 build/rnode_firmware_ng21.bin build/rnode_firmware_ng21.bootloader build/rnode_firmware_ng21.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_ng21.zip build/rnode_firmware_ng21.boot_app0 build/rnode_firmware_ng21.bin build/rnode_firmware_ng21.bootloader build/rnode_firmware_ng21.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-techo:
@@ -480,7 +480,7 @@ release-t3s3:
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_t3s3_sx126x.bootloader
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_t3s3_sx126x.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_t3s3_sx126x.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_t3s3_sx126x.boot_app0 build/rnode_firmware_t3s3_sx126x.bin build/rnode_firmware_t3s3_sx126x.bootloader build/rnode_firmware_t3s3_sx126x.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_t3s3_sx126x.zip build/rnode_firmware_t3s3_sx126x.boot_app0 build/rnode_firmware_t3s3_sx126x.bin build/rnode_firmware_t3s3_sx126x.bootloader build/rnode_firmware_t3s3_sx126x.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-t3s3_sx127x:
@@ -490,7 +490,7 @@ release-t3s3_sx127x:
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_t3s3_sx127x.bootloader
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_t3s3_sx127x.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_t3s3_sx127x.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_t3s3_sx127x.boot_app0 build/rnode_firmware_t3s3_sx127x.bin build/rnode_firmware_t3s3_sx127x.bootloader build/rnode_firmware_t3s3_sx127x.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_t3s3_sx127x.zip build/rnode_firmware_t3s3_sx127x.boot_app0 build/rnode_firmware_t3s3_sx127x.bin build/rnode_firmware_t3s3_sx127x.bootloader build/rnode_firmware_t3s3_sx127x.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-t3s3_sx1280_pa:
@@ -500,7 +500,7 @@ release-t3s3_sx1280_pa:
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_t3s3_sx1280_pa.bootloader
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_t3s3_sx1280_pa.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_t3s3_sx1280_pa.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_t3s3_sx1280_pa.boot_app0 build/rnode_firmware_t3s3_sx1280_pa.bin build/rnode_firmware_t3s3_sx1280_pa.bootloader build/rnode_firmware_t3s3_sx1280_pa.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_t3s3_sx1280_pa.zip build/rnode_firmware_t3s3_sx1280_pa.boot_app0 build/rnode_firmware_t3s3_sx1280_pa.bin build/rnode_firmware_t3s3_sx1280_pa.bootloader build/rnode_firmware_t3s3_sx1280_pa.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-e22_esp32:
@@ -510,7 +510,7 @@ release-e22_esp32:
 	cp build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_esp32_e22.bootloader
 	cp build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_esp32_e22.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_esp32_e22.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_esp32_e22.boot_app0 build/rnode_firmware_esp32_e22.bin build/rnode_firmware_esp32_e22.bootloader build/rnode_firmware_esp32_e22.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_esp32_e22.zip build/rnode_firmware_esp32_e22.boot_app0 build/rnode_firmware_esp32_e22.bin build/rnode_firmware_esp32_e22.bootloader build/rnode_firmware_esp32_e22.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-tdeck:
@@ -520,7 +520,7 @@ release-tdeck:
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_tdeck.bootloader
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_tdeck.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_tdeck.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_tdeck.boot_app0 build/rnode_firmware_tdeck.bin build/rnode_firmware_tdeck.bootloader build/rnode_firmware_tdeck.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_tdeck.zip build/rnode_firmware_tdeck.boot_app0 build/rnode_firmware_tdeck.bin build/rnode_firmware_tdeck.bootloader build/rnode_firmware_tdeck.partitions build/$(STR_VERS).version
 	rm -r build
 
 
@@ -531,7 +531,7 @@ release-tbeam_supreme:
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_tbeam_supreme.bootloader
 	cp build/esp32.esp32.esp32s3/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_tbeam_supreme.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_tbeam_supreme.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_tbeam_supreme.boot_app0 build/rnode_firmware_tbeam_supreme.bin build/rnode_firmware_tbeam_supreme.bootloader build/rnode_firmware_tbeam_supreme.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_tbeam_supreme.zip build/rnode_firmware_tbeam_supreme.boot_app0 build/rnode_firmware_tbeam_supreme.bin build/rnode_firmware_tbeam_supreme.bootloader build/rnode_firmware_tbeam_supreme.partitions build/$(STR_VERS).version
 	rm -r build
 
 
@@ -542,7 +542,7 @@ release-featheresp32: check_bt_buffers
 	cp build/esp32.esp32.featheresp32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_featheresp32.bootloader
 	cp build/esp32.esp32.featheresp32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_featheresp32.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_featheresp32.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_featheresp32.boot_app0 build/rnode_firmware_featheresp32.bin build/rnode_firmware_featheresp32.bootloader build/rnode_firmware_featheresp32.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_featheresp32.zip build/rnode_firmware_featheresp32.boot_app0 build/rnode_firmware_featheresp32.bin build/rnode_firmware_featheresp32.bootloader build/rnode_firmware_featheresp32.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-genericesp32: check_bt_buffers
@@ -552,7 +552,7 @@ release-genericesp32: check_bt_buffers
 	cp build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.bootloader.bin build/rnode_firmware_esp32_generic.bootloader
 	cp build/esp32.esp32.esp32/HConnector-LoRaPay-Firmware-master.ino.partitions.bin build/rnode_firmware_esp32_generic.partitions
 	touch build/$(STR_VERS).version
-	zip --junk-paths ./Release/rnode_firmware_esp32_generic.zip ./Release/esptool/esptool.py ./Release/console_image.bin build/rnode_firmware_esp32_generic.boot_app0 build/rnode_firmware_esp32_generic.bin build/rnode_firmware_esp32_generic.bootloader build/rnode_firmware_esp32_generic.partitions build/$(STR_VERS).version
+	zip --junk-paths ./Release/rnode_firmware_esp32_generic.zip build/rnode_firmware_esp32_generic.boot_app0 build/rnode_firmware_esp32_generic.bin build/rnode_firmware_esp32_generic.bootloader build/rnode_firmware_esp32_generic.partitions build/$(STR_VERS).version
 	rm -r build
 
 release-rak4631:
