@@ -19,6 +19,13 @@
 #ifndef CONFIG_H
 	#define CONFIG_H
 
+	#define VENDOR_BT_DEVNAME "HConnector LoRaPay"
+	#define VENDOR_BT_DEVNAME_LEN 24
+	#define VENDOR_DISPLAY_OVERLAY
+	#define VENDOR_DISPLAY_ROW1 "HConnector"
+	#define VENDOR_DISPLAY_ROW2 "LoRaPay"
+	#define VENDOR_DISPLAY_TRANSPORT "T:HConnector"
+
 	#define MAJ_VERS  0x01
 	#define MIN_VERS  0x55
 

@@ -153,8 +153,8 @@ def firmware_package(env):
         env.Execute("rm -f " + project_dir + "/Release/" + env.subst("$PROGNAME") + ".zip")
         zip_cmd = "zip --junk-paths "
         zip_cmd += project_dir + "/Release/rnode_firmware_" + variant + ".zip "
-        zip_cmd += project_dir + "/Release/esptool/esptool.py "
-        zip_cmd += project_dir + "/Release/console_image.bin "
+        #zip_cmd += project_dir + "/Release/esptool/esptool.py "
+        #zip_cmd += project_dir + "/Release/console_image.bin "
         zip_cmd += build_dir + "/" + env.subst("$PROGNAME") + ".bin "
         zip_cmd += build_dir + "/" + env.subst("$PROGNAME") + ".boot_app0 "
         zip_cmd += build_dir + "/" + env.subst("$PROGNAME") + ".bootloader "

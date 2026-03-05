@@ -1,3 +1,17 @@
+# ĦConnector LoRaPay Firmware
+
+Our LoRa radio module for connection from ĦWallet and ĦCommunicator to the HydraMeshnet without internet connection.
+
+
+## Installation
+
+### Android
+For your Android devices, download our ĦWallet or ĦCommunicator app and following the connection wizard.
+
+
+## Source / Based on microReticulum_Firmware
+
+
 # microReticulum_Firmware
 
 Fork of RNode_Firmware with integration of the [microReticulum](https://github.com/attermann/microReticulum) Network Stack to implement a completeley self-contained standalone Reticulum node.

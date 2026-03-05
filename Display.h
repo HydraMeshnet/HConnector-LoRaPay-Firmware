@@ -812,7 +812,7 @@ void update_stat_area() {
 #define START_PAGE 0
 const uint8_t pages = 3;
 uint8_t disp_page = START_PAGE;
-extern char bt_devname[11];
+extern char bt_devname[VENDOR_BT_DEVNAME_LEN];
 extern char bt_dh[16];
 #if HAS_WIFI
   extern IPAddress wr_device_ip;
@@ -933,6 +933,30 @@ void draw_disp_area() {
           disp_area.setCursor(17+ofsc, 32); disp_area.printf("%02X%02X", bt_dh[14], bt_dh[15]);
         }
       }
+
+      #ifdef VENDOR_DISPLAY_OVERLAY
+      disp_area.setFont(SMALL_FONT); disp_area.setTextWrap(false); disp_area.setTextColor(SSD1306_BLACK); disp_area.setTextSize(1);
+      if (radio_online && display_diagnostics) {
+        disp_area.fillRect(0,0,disp_area.width(),7,SSD1306_WHITE);
+        if (op_mode == MODE_TNC) {
+          #ifdef VENDOR_DISPLAY_TRANSPORT
+          disp_area.setCursor(2, 5); disp_area.print(VENDOR_DISPLAY_TRANSPORT);
+          #endif
+        } else {
+          #ifdef VENDOR_DISPLAY_ROW1
+          disp_area.setCursor(2, 5); disp_area.print(VENDOR_DISPLAY_ROW1);
+          #endif
+        }
+      } else {
+        disp_area.fillRect(0,0,disp_area.width(),21,SSD1306_WHITE);
+        #ifdef VENDOR_DISPLAY_ROW1
+        disp_area.setCursor(3, 8); disp_area.print(VENDOR_DISPLAY_ROW1);
+        #endif
+        #ifdef VENDOR_DISPLAY_ROW2
+        disp_area.setCursor(3, 17); disp_area.print(VENDOR_DISPLAY_ROW2);
+        #endif
+      }
+      #endif
 
       if (!hw_ready || radio_error || !device_firmware_ok()) {
         if (!device_firmware_ok()) {
